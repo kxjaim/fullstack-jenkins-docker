@@ -3,20 +3,18 @@ FROM node:20-alpine AS builder
 ARG API_HOST=http://localhost:3001
 WORKDIR /app
 
-# ⬇️ เพิ่มบรรทัดนี้ (ลด memory usage)
-ENV NODE_OPTIONS="--max-old-space-size=1024"
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-COPY package*.json ./
+COPY package.json ./
 
-# ⬇️ เพิ่ม --maxsockets=1 (ลด concurrent downloads)
-RUN npm ci --maxsockets=1 --legacy-peer-deps || \
-    npm install --legacy-peer-deps && \
-    npm cache clean --force
-    
+# ใช้ yarn แทน npm
+RUN corepack enable && \
+    yarn install --network-timeout 600000
+
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1 \
     API_HOST=${API_HOST}
-RUN npm run build
+RUN yarn build
 
 # ---------- Stage 2: Production runtime ----------
 FROM node:20-alpine AS runner
