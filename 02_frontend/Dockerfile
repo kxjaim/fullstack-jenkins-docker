@@ -2,9 +2,14 @@
 FROM node:20-alpine AS builder
 ARG API_HOST=http://localhost:3001
 WORKDIR /app
+
+# ⬇️ เพิ่มบรรทัดนี้ (ลด memory usage)
+ENV NODE_OPTIONS="--max-old-space-size=1024"
+
 COPY package*.json ./
 
-RUN npm ci --fetch-timeout=900000 --fetch-retries=10 --legacy-peer-deps || \
+# ⬇️ เพิ่ม --maxsockets=1 (ลด concurrent downloads)
+RUN npm ci --maxsockets=1 --legacy-peer-deps || \
     npm install --legacy-peer-deps && \
     npm cache clean --force
     
