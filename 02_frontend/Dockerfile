@@ -4,9 +4,10 @@ ARG API_HOST=http://localhost:3001
 WORKDIR /app
 COPY package*.json ./
 
-RUN npm ci --fetch-timeout=600000 --fetch-retries=5 && npm cache clean --force
-
-RUN npm ci && npm cache clean --force
+RUN npm ci --fetch-timeout=900000 --fetch-retries=10 --legacy-peer-deps || \
+    npm install --legacy-peer-deps && \
+    npm cache clean --force
+    
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1 \
     API_HOST=${API_HOST}
