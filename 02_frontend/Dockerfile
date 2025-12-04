@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 ARG API_HOST=http://localhost:3001
 WORKDIR /app
 COPY package*.json ./
+
+RUN npm ci --fetch-timeout=600000 --fetch-retries=5 && npm cache clean --force
+
 RUN npm ci && npm cache clean --force
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1 \
