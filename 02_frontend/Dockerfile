@@ -1,20 +1,18 @@
 # ---------- Stage 1: Build the Next.js application ----------
-FROM node:20-alpine AS builder
+FROM node:20 AS builder
 ARG API_HOST=http://localhost:3001
 WORKDIR /app
 
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-COPY package.json ./
+COPY package.json package-lock.json* ./
 
-# ใช้ yarn แทน npm
-RUN corepack enable && \
-    yarn install --network-timeout 600000
+RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1 \
     API_HOST=${API_HOST}
-RUN yarn build
+RUN npm run build
 
 # ---------- Stage 2: Production runtime ----------
 FROM node:20-alpine AS runner
