@@ -63,6 +63,7 @@ export default function Page() {
                     className="img"
                     loading="lazy"
                     decoding="async"
+                    referrerPolicy="no-referrer"
                   />
                 </div>
               )}
